@@ -133,6 +133,7 @@ RSpec.describe '/api/v1/movies' do
             .to match_array([
               "Name can't be blank",
               "Synopsis can't be blank",
+              "Minutes is not a number",
               "Minutes can't be blank",
               "Preview video url can't be blank",
               "Genre ids can't be blank"
@@ -158,6 +159,73 @@ RSpec.describe '/api/v1/movies' do
         before { post '/api/v1/movies', params: params, headers: authentication_headers_for(admin) }
 
         it { expect(response.status).to eq(200) }
+      end
+    end
+  end
+
+  describe 'put /movies/:id' do
+    context 'when request is not authenticated' do
+      before { put api_v1_movie_path(movie_1) }
+
+      it { expect(response.status).to eq(401) }
+    end
+
+    context 'when request is made by a user' do
+      let(:user) { create(:user, role: :user) }
+      before { put api_v1_movie_path(movie_1), headers: authentication_headers_for(user) }
+
+      it { expect(response.status).to eq(403) }
+    end
+
+    context 'when request is made by an admin' do
+      let(:admin) { create(:user, role: :admin) }
+
+      context 'when params are not provided' do
+        before { put api_v1_movie_path(movie_1), headers: authentication_headers_for(admin) }
+
+        it { expect(response.status).to eq(400) }
+
+        it do
+          expect(body['errors'])
+            .to match_array([
+              "Name can't be blank",
+              "Synopsis can't be blank",
+              "Minutes is not a number",
+              "Minutes can't be blank",
+              "Preview video url can't be blank",
+              "Genre ids can't be blank"
+            ])
+        end
+      end
+
+      context 'when correct params are provided' do
+        let(:adventure) { create(:genre, name: 'Adventure') }
+        let(:comedy) { create(:genre, name: 'Comedy') }
+        let(:sci_fi) { create(:genre, name: 'Sci-Fi') }
+
+        let(:params) do
+          {
+            name: 'Back to the future',
+            minutes: 116,
+            synopsis: 'Marty McFly, a 17-year-old high school student, is accidentally sent thirty years into the past in a time-traveling DeLorean by his close friend, the eccentric scientist Doc Brown.',
+            preview_video_url: 'https://www.youtube.com/watch?v=qvsgGtivCgs',
+            genre_ids: [adventure.id, comedy.id, sci_fi.id]
+          }
+        end
+
+        it do
+          put api_v1_movie_path(movie_1), params: params, headers: authentication_headers_for(admin)
+          expect(response.status).to eq(200)
+        end
+
+        it do
+          expect { put api_v1_movie_path(movie_1), params: params, headers: authentication_headers_for(admin) }
+            .to change { movie_1.reload.name }.to(params[:name])
+            .and change { movie_1.minutes }.to(params[:minutes])
+            .and change { movie_1.synopsis }.to(params[:synopsis])
+            .and change { movie_1.preview_video_url }.to(params[:preview_video_url])
+            .and change { movie_1.genre_ids }.to(params[:genre_ids])
+        end
       end
     end
   end

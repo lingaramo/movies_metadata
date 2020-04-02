@@ -25,6 +25,17 @@ class Api::V1::MoviesController < ApplicationController
     end
   end
 
+  def update
+    movie_update = MovieUpdate.new(update_params)
+    authorize movie_update.movie
+
+    if movie_update.save
+      render json: movie_update.movie
+    else
+      render json: { errors: movie_update.errors.full_messages }, status: :bad_request
+    end
+  end
+
   private
 
   def movie_ids
@@ -35,5 +46,9 @@ class Api::V1::MoviesController < ApplicationController
 
   def creation_params
     params.permit(:name, :synopsis, :minutes, :preview_video_url, genre_ids: [])
+  end
+
+  def update_params
+    params.permit(:id, :name, :synopsis, :minutes, :preview_video_url, genre_ids: [])
   end
 end
