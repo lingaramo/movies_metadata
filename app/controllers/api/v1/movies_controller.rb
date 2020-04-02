@@ -5,7 +5,7 @@ class Api::V1::MoviesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
 
   def index
-    movies = Movie.eager_load(:scores, :genres).where(id: movie_ids)
+    movies = Movie.eager_load(:scores, :genres).latest_version.where(id: movie_ids)
 
     render json: movies
   end
@@ -34,6 +34,15 @@ class Api::V1::MoviesController < ApplicationController
     else
       render json: { errors: movie_update.errors.full_messages }, status: :bad_request
     end
+  end
+
+  def destroy
+    movie = Movie.find(params[:id])
+    authorize movie
+
+    movie.soft_delete!
+
+    head :no_content
   end
 
   private

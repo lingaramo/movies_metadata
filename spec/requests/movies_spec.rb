@@ -229,4 +229,28 @@ RSpec.describe '/api/v1/movies' do
       end
     end
   end
+
+  describe 'delete /movies/:id' do
+    context 'when request is not authenticated' do
+      before { delete api_v1_movie_path(movie_1) }
+
+      it { expect(response.status).to eq(401) }
+    end
+
+    context 'when request is made by a user' do
+      let(:user) { create(:user, role: :user) }
+      before { delete api_v1_movie_path(movie_1), headers: authentication_headers_for(user) }
+
+      it { expect(response.status).to eq(403) }
+    end
+
+    context 'when request is made by an admin' do
+      let(:admin) { create(:user, role: :admin) }
+
+      before { delete api_v1_movie_path(movie_1), headers: authentication_headers_for(admin) }
+
+      it { expect(response.status).to eq(204) }
+      it { expect(movie_1.reload.deleted_at).not_to be(nil) }
+    end
+  end
 end
