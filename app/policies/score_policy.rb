@@ -10,6 +10,10 @@ class ScorePolicy < ApplicationPolicy
     user.user?
   end
 
+  def destroy?
+    user.user? && score.user == user
+  end
+
   class Scope < Scope
     def resolve
       scope.all

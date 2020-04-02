@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe '/api/v1/movies/:id/scores' do
+RSpec.describe '/api/v1/movies/:movie_id/scores' do
   let(:body) { JSON.parse(response.body) }
   let!(:movie) { create(:movie) }
 
@@ -58,4 +58,36 @@ RSpec.describe '/api/v1/movies/:id/scores' do
     end
   end
 
+  describe 'delete /scores/:id' do
+    let!(:score) { create(:score, movie: movie) }
+
+    context 'when request is not authenticated' do
+      before { delete api_v1_movie_score_path(movie, score) }
+
+      it { expect(response.status).to eq(401) }
+    end
+
+    context 'when request is made by the user who create the score' do
+      let(:user) { score.user }
+
+      before { delete api_v1_movie_score_path(movie, score), headers: authentication_headers_for(user) }
+
+      it { expect(response.status).to eq(204) }
+    end
+
+    context 'when request is not made by the user who create the score' do
+      let(:user) { create(:user, role: :user) }
+      before { delete api_v1_movie_score_path(movie, score), headers: authentication_headers_for(user) }
+
+      it { expect(response.status).to eq(403) }
+    end
+
+    context 'when request is made by an admin' do
+      let(:admin) { create(:user, role: :admin) }
+
+      before { delete api_v1_movie_score_path(movie, score), headers: authentication_headers_for(admin) }
+
+      it { expect(response.status).to eq(403) }
+    end
+  end
 end

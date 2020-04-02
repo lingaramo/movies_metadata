@@ -16,6 +16,14 @@ class Api::V1::ScoresController < ApplicationController
     end
   end
 
+  def destroy
+    score = Score.find(params[:id])
+
+    authorize score
+
+    score.destroy!
+  end
+
   private
 
   def creation_params
