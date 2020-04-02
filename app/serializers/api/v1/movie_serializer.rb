@@ -14,7 +14,7 @@ class Api::V1::MovieSerializer < ActiveModel::Serializer
   end
 
   def avg_score
-    object.scores.average(:score) || 0
+    object.scores.average(:score)&.round || 0
   end
 
   def created_at

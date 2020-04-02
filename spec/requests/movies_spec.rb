@@ -64,4 +64,45 @@ RSpec.describe '/api/v1/movies' do
       end
     end
   end
+
+  describe 'get /movies/:id' do
+    let(:avg_score) { 0 }
+    let(:most_recent_scores) { [] }
+    let(:expected_response) do
+      {
+        'id' => movie_1.id,
+        'name' => movie_1.name,
+        'synopsis' => movie_1.synopsis,
+        'runtime' => '1 hr 30 min',
+        'preview_video_url' => 'https://www.youtube.com/movie_1',
+        'avg_score' => avg_score,
+        'created_at' => movie_1.created_at.to_i,
+        'updated_at' => movie_1.updated_at.to_i,
+        'most_recent_scores' => most_recent_scores,
+        'genres' => [{ 'id' => 1, 'name' => 'Thriller' }]
+      }
+    end
+
+    it do
+      get "/api/v1/movies/#{movie_1.id}"
+      expect(body).to match(expected_response)
+    end
+
+    context 'when movie has been scored' do
+      let!(:score_1) { create(:score, score: 75, movie: movie_1) }
+      let!(:score_2) { create(:score, score: 80, movie: movie_1) }
+      let(:avg_score) { 78 }
+      let(:most_recent_scores) do
+        [
+          {'id' => score_1.id, 'user_id' => score_1.user_id, 'score' => score_1.score, 'created_at' => score_1.created_at.to_i},
+          {'id' => score_2.id, 'user_id' => score_2.user_id, 'score' => score_2.score, 'created_at' => score_2.created_at.to_i}
+        ]
+      end
+
+      it do
+        get "/api/v1/movies/#{movie_1.id}"
+        expect(body).to match(expected_response)
+      end
+    end
+  end
 end

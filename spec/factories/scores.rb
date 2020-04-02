@@ -3,5 +3,6 @@
 FactoryBot.define do
   factory :score do
     score { rand(101) }
+    user
   end
 end
