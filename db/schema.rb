@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_02_151511) do
+ActiveRecord::Schema.define(version: 2020_04_02_221130) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 2020_04_02_151511) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_movies_on_name", unique: true
     t.index ["preview_video_url"], name: "index_movies_on_preview_video_url", unique: true
+    t.datetime "deleted_at"
   end
 
   create_table "scores", force: :cascade do |t|
