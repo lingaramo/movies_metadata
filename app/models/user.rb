@@ -2,6 +2,7 @@
 
 class User < ActiveRecord::Base
   extend Devise::Models
+  extend Enumerize
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -10,4 +11,6 @@ class User < ActiveRecord::Base
   include DeviseTokenAuth::Concerns::User
 
   has_many :scores
+
+  enumerize :role, in: %i[user admin].freeze, predicates: true
 end
