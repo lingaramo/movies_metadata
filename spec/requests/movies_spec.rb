@@ -105,4 +105,60 @@ RSpec.describe '/api/v1/movies' do
       end
     end
   end
+
+  describe 'post /movies' do
+    context 'when request is not authenticated' do
+      before { post '/api/v1/movies' }
+
+      it { expect(response.status).to eq(401) }
+    end
+
+    context 'when request is made by a user' do
+      let(:user) { create(:user, role: :user) }
+      before { post '/api/v1/movies', headers: authentication_headers_for(user) }
+
+      it { expect(response.status).to eq(403) }
+    end
+
+    context 'when request is made by an admin' do
+      let(:admin) { create(:user, role: :admin) }
+
+      context 'when params are not provided' do
+        before { post '/api/v1/movies', headers: authentication_headers_for(admin) }
+
+        it { expect(response.status).to eq(400) }
+
+        it do
+          expect(body['errors'])
+            .to match_array([
+              "Name can't be blank",
+              "Synopsis can't be blank",
+              "Minutes can't be blank",
+              "Preview video url can't be blank",
+              "Genre ids can't be blank"
+            ])
+        end
+      end
+
+      context 'when correct params are provided' do
+        let(:adventure) { create(:genre, name: 'Adventure') }
+        let(:comedy) { create(:genre, name: 'Comedy') }
+        let(:sci_fi) { create(:genre, name: 'Sci-Fi') }
+
+        let(:params) do
+          {
+            name: 'Back to the future',
+            minutes: 116,
+            synopsis: 'Marty McFly, a 17-year-old high school student, is accidentally sent thirty years into the past in a time-traveling DeLorean by his close friend, the eccentric scientist Doc Brown.',
+            preview_video_url: 'https://www.youtube.com/watch?v=qvsgGtivCgs',
+            genre_ids: [adventure.id, comedy.id, sci_fi.id]
+          }
+        end
+
+        before { post '/api/v1/movies', params: params, headers: authentication_headers_for(admin) }
+
+        it { expect(response.status).to eq(200) }
+      end
+    end
+  end
 end
