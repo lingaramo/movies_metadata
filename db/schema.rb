@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_02_144040) do
+ActiveRecord::Schema.define(version: 2020_04_02_144219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,6 +18,14 @@ ActiveRecord::Schema.define(version: 2020_04_02_144040) do
   create_table "genres", force: :cascade do |t|
     t.string "name", null: false
     t.index ["name"], name: "index_genres_on_name", unique: true
+  end
+
+  create_table "movie_genres", force: :cascade do |t|
+    t.bigint "movie_id", null: false
+    t.bigint "genre_id", null: false
+    t.index ["genre_id"], name: "index_movie_genres_on_genre_id"
+    t.index ["movie_id", "genre_id"], name: "index_movie_genres_on_movie_id_and_genre_id", unique: true
+    t.index ["movie_id"], name: "index_movie_genres_on_movie_id"
   end
 
   create_table "movies", force: :cascade do |t|
@@ -54,4 +62,6 @@ ActiveRecord::Schema.define(version: 2020_04_02_144040) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "movie_genres", "genres"
+  add_foreign_key "movie_genres", "movies", on_delete: :cascade
 end
