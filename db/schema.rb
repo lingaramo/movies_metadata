@@ -35,9 +35,9 @@ ActiveRecord::Schema.define(version: 2020_04_02_221130) do
     t.integer "minutes", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_movies_on_name", unique: true
-    t.index ["preview_video_url"], name: "index_movies_on_preview_video_url", unique: true
     t.datetime "deleted_at"
+    t.index ["name"], name: "index_movies_on_name"
+    t.index ["preview_video_url"], name: "index_movies_on_preview_video_url"
   end
 
   create_table "scores", force: :cascade do |t|
