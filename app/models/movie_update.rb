@@ -1,25 +1,26 @@
 # frozen_string_literal: true
 
-class MovieCreation
+class MovieUpdate
   include ActiveModel::Model
 
-  attr_accessor :name, :synopsis, :minutes, :preview_video_url, :genre_ids
-
-  validates :name, :synopsis, :minutes, :preview_video_url, :genre_ids, presence: true
+  attr_accessor :id, :name, :synopsis, :minutes, :preview_video_url, :genre_ids
+  validates :movie, :name, :synopsis, :minutes, :preview_video_url, :genre_ids, presence: true
   validates_numericality_of :minutes, greater_than: Movie::MINIMUM_MINUTES_VALUE
+
   validate :genre_ids_must_exist, if: -> { genre_ids.present? }
 
   def save
     return false unless valid?
 
+    movie.assign_attributes(movie_attrs)
     movie.save
-    movie.genres << genres
+    movie.genres.replace(genres)
 
     true
   end
 
   def movie
-    @movie ||= Movie.new(movie_attrs)
+    @movie ||= Movie.find_by(id: id)
   end
 
   def genres
