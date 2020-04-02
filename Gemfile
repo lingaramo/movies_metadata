@@ -25,6 +25,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'devise_token_auth'
 gem 'enumerize'
+gem 'pundit'
 
 group :development, :test do
   gem 'pry-rails'
