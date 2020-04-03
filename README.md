@@ -66,7 +66,7 @@
     ```ruby
     require 'httparty'
 
-    class MovieMethadata
+    class MovieMetadata
       BASE_URL = 'http://localhost:3000'
       AUTH_HEADERS_KEYS = ['access-token', 'expiry', 'token-type', 'uid', 'client', 'content-type']
 
@@ -140,13 +140,13 @@
 
     # Examples:
     #
-    # user = MovieMethadata.new('john@doe.com', 123456)
+    # user = MovieMetadata.new('john@doe.com', 123456)
     # user.get('/api/v1/movies?movie_ids=1,2,3')
     # user.get('/api/v1/movies/1')
     # user.delete('/api/v1/movies/2/scores/2')
     # user.post('/api/v1/movies/2/scores', {score: 100})
     #
-    # admin = MovieMethadata.new('admin@email.com', 123456)
+    # admin = MovieMetadata.new('admin@email.com', 123456)
     # admin.get('/api/v1/movies?movie_ids=1,2,3')
     # admin.get('/api/v1/movies/1')
     # body = { name: 'Another movie', synopsis: 'Synopsis', minutes: 123, preview_video_url: 'www.youtube.com', genre_ids: [1,2,3] }
